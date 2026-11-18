@@ -171,8 +171,9 @@ pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px sol
 </div></div>
 
 <script>
-// Google Apps Script のウェブアプリURL（README の手順で発行したものを貼る）
-const ENDPOINT="";
+// 送信先：cancaonova.chorus@gmail.com の Google フォーム（回答はスプレッドシート「2027年度 本番プランニング 回答」に入る）
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSebjNguJBi9DgjhokrVItT8WP8zYBu59AjxswOKEcKGl4Z0vQ/formResponse";
+const FORM_FIELDS={name:"entry.2073416878",branch:"entry.1991724795",plan:"entry.398565553",data:"entry.1052714977"};
 const MONTHS=["4","5","6","7","8","9","10","11","12","1","2","3"];
 const FIXED=[
   {id:"mahler",tag:"個人参加（団の本番ではありません）",name:"マーラー（Atem Philharmonic Orchestra 第2回定演）",when:"4/24",m:0,region:"other",count:false,note:"団としては扱いませんが、参加を推奨しています（個人参加）。"},
@@ -334,10 +335,14 @@ document.getElementById("submit").addEventListener("click",async()=>{
   const p=payload();
   if(!S.name.trim()){status.className="status err";status.textContent="お名前を入力してください。";document.getElementById("name").focus();return;}
   if(!selected().length&&!Object.keys(p.dropped).length){status.className="status err";status.textContent="本番のカードで「出る／出ない」を選んでから送信してください。";return;}
-  if(!ENDPOINT){status.className="status err";status.textContent="送信先が設定されていません。「回答をテキストでコピー」で集計担当に送ってください。";return;}
   status.className="status";status.textContent="送信しています…";
   try{
-    await fetch(ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(flatRow(p))});
+    const row=flatRow(p);
+    const body=new URLSearchParams();
+    body.set(FORM_FIELDS.name,row["名前"]);body.set(FORM_FIELDS.branch,row["所属"]||"未回答");
+    body.set(FORM_FIELDS.plan,p.plan.map(x=>x.name).join("、")||"なし");
+    body.set(FORM_FIELDS.data,JSON.stringify(row));
+    await fetch(FORM_URL,{method:"POST",mode:"no-cors",body});
     status.className="status ok";status.textContent=p.undecided.length?"送信しました（未判断が"+p.undecided.length+"件あります。同じ名前で送り直すと、最新の回答が使われます）。":"送信しました。同じ名前で送り直すと、最新の回答が使われます。";
   }catch(err){status.className="status err";status.textContent="送信できませんでした。通信状況を確かめてもう一度送るか、「回答をテキストでコピー」で集計担当に送ってください。";}
 });
