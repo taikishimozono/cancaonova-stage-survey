@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>2027年度 本番プランニング</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: one column; each 本番 is one card holding every input about it (わくわく度 → 出る/出ない → 理由). A sticky tally bar recounts as decisions change. */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --fg:#1b2230; --muted:#5d6676; --line:#dde1e8;
+  --accent:#1f5f8b; --accent-soft:#e3eef6; --out-soft:#f1f2f4;
+  --kansai:#b4533a; --kanto:#2f6f5e; --other:#6b5d9a;
+  --display:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --body:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --surface:#1a2029; --fg:#e6e9ee; --muted:#9aa3b2; --line:#2c3440;
+  --accent:#7fb4dc; --accent-soft:#1f2f3d; --out-soft:#20252d; --kansai:#e08a72; --kanto:#6fbfa8; --other:#a99be0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --surface:#1a2029; --fg:#e6e9ee; --muted:#9aa3b2; --line:#2c3440;
+  --accent:#7fb4dc; --accent-soft:#1f2f3d; --out-soft:#20252d; --kansai:#e08a72; --kanto:#6fbfa8; --other:#a99be0; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.7}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 140px;display:flex;flex-direction:column;gap:32px}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.35}
+h1{font-size:1.7rem}
+h2{font-size:1.2rem}
+p{margin:0}
+.muted{color:var(--muted);font-size:.88rem}
+.proto{font-size:.8rem;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:8px 12px}
+.lead,section{display:flex;flex-direction:column;gap:12px}
+.lead strong{color:var(--accent)}
+.how{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.88rem;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.how b{color:var(--accent);font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:12px}
+.tl{display:flex;flex-direction:column}
+.mrow{display:grid;grid-template-columns:4.2em minmax(0,1fr);gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.mrow:last-child{border-bottom:1px solid var(--line)}
+.mlab{position:sticky;top:8px;align-self:start;display:flex;flex-direction:column;line-height:1.2}
+.mlab b{font-family:var(--display);font-size:1.35rem;font-variant-numeric:tabular-nums}
+.mlab span{font-size:.72rem;color:var(--muted)}
+.mlab span.on{color:var(--accent);font-weight:700}
+.mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
+.mcards .field{grid-template-columns:1fr;gap:4px}
+.mempty{font-size:.85rem;color:var(--muted);align-self:center}
+@media (max-width:620px){.mrow{grid-template-columns:1fr;gap:8px;padding-top:0}.mlab{top:0;z-index:2;flex-direction:row;align-items:baseline;gap:10px;background:var(--bg);padding:8px 0 6px;border-bottom:1px solid var(--line)}.mlab b{font-size:1.15rem}}
+.lead>*,section>p,section>h2,.how,.proto,.rank,section>.card,.actions{max-width:760px}
+.rowhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rowhead .muted{flex:1;min-width:12em}
+.nav{display:flex;gap:6px}
+.nav button{width:36px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
+.list.row{flex-direction:row;overflow-x:auto;scroll-snap-type:x proximity;align-items:flex-start;padding:2px 2px 10px;overscroll-behavior-x:contain}
+.list.row>.card{flex:0 0 300px;scroll-snap-align:start}
+.list.row>.card.fixed{flex-basis:240px}
+.list.row .field{grid-template-columns:1fr;gap:4px}
+@media (max-width:520px){.list.row>.card{flex-basis:84vw}.list.row>.card.fixed{flex-basis:64vw}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.in{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card.out{background:var(--out-soft)}
+.card.fixed{background:transparent;border-style:dashed;padding:12px 16px;gap:4px}
+.ev-head{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.ev-name{font-weight:700;font-size:1.02rem}
+.when{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem}
+.ricon{font-size:1rem;line-height:1;white-space:nowrap}
+.tally .k.ricon{font-size:1rem}
+.chip{font-size:.72rem;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.c-kansai{color:var(--kansai)} .c-kanto{color:var(--kanto)} .c-other{color:var(--other)} .c-muted{color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted)}
+.nlist{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:2px}
+.field{display:grid;grid-template-columns:7.5em 1fr;gap:8px 12px;align-items:center}
+.field>.k{font-size:.8rem;color:var(--muted);font-weight:700;letter-spacing:.02em}
+.field>.k small{display:block;font-weight:400}
+@media (max-width:520px){.field{grid-template-columns:1fr;gap:4px}}
+.scale{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.scale button{width:34px;height:34px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;cursor:pointer;font-variant-numeric:tabular-nums}
+.scale button[aria-pressed="true"]{background:var(--fg);color:var(--surface);border-color:var(--fg)}
+.scale.avail button{width:40px;font-size:1.05rem}
+.scale .lbl{font-size:.72rem;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content}
+.seg button{font:inherit;font-weight:700;padding:7px 18px;border:0;background:var(--bg);color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"].yes{background:var(--accent);color:var(--surface)}
+.seg button[aria-pressed="true"].no{background:var(--muted);color:var(--surface)}
+.detail{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.opts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem}
+.opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags button{font:inherit;font-size:.8rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.tags button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+input[type=text],textarea,input[type=number],select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+textarea{min-height:64px;resize:vertical}
+input[type=number],select{width:auto}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rank{display:flex;flex-direction:column;gap:6px;counter-reset:r;padding:0;margin:0}
+.rank li{list-style:none;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+.rank li::before{counter-increment:r;content:counter(r);font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);width:1.4em;text-align:right}
+.rank li span{flex:1;min-width:0}
+.rank button{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:4px;width:32px;height:28px;cursor:pointer}
+.months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px}
+.mo{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mo .m{font-size:.68rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.mo .stack{display:flex;flex-direction:column-reverse;gap:2px;min-height:40px;background:var(--bg);border-radius:3px;padding:2px}
+.dot{height:8px;border-radius:2px}
+.d-kansai{background:var(--kansai)} .d-kanto{background:var(--kanto)} .d-other{background:var(--other)} .d-fixed{background:var(--muted);opacity:.45}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.tally{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.tally .in{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;gap:6px 18px;flex-wrap:wrap;align-items:baseline;font-variant-numeric:tabular-nums}
+.tally b{font-size:1.2rem;font-family:var(--display)}
+.tally .k{font-size:.75rem;color:var(--muted);margin-right:4px}
+.tally .left{margin-left:auto;font-size:.78rem;color:var(--muted)}
+.btn{font:inherit;font-weight:700;padding:10px 18px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+.btn.sub{background:transparent;color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.status{font-size:.88rem}
+.status.ok{color:var(--kanto)} .status.err{color:var(--kansai)}
+pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;max-height:240px;overflow:auto}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="lead">
+    <h1>2027年度 本番プランニング</h1>
+    <p>来年度ノーヴァがどの本番に出るかを考えるためのアンケートです。<strong>「あなたがTLだったら、2027年度をどう組むか」</strong>という立場で答えてください。本番の数も含めて自由に組んでかまいません。</p>
+    <div class="how">
+      <b>1</b><span>まず、団として大事にしたい目的を順に並べる</span>
+      <b>2</b><span>本番ごとのカードで、わくわく度（個人の気持ち）と、団として出るべきか、その理由を入力する</span>
+      <b>3</b><span>最後に、お名前と所属を入力して送信する</span>
+    </div>
+    <p class="proto">試作版です。日程は仮の内容で、TLで確認中です。所要時間は10〜15分ほどです。</p>
+  </header>
+
+  <section>
+    <h2>1. 団として大事にしたい目的</h2>
+    <p class="muted">来年度のノーヴァにとって大事だと思う順に並べ替えてください。本番の理由を選ぶときに使います。</p>
+    <ol class="rank" id="rankList"></ol>
+  </section>
+
+  <section>
+    <h2>2. 本番ごとの判断</h2>
+    <p class="muted">月ごとに本番を並べています。各カードで「わくわく度」はあなた個人の気持ち、「団として」は団にとって出るべきかを答えてください。点線のカードは確定・参考で、入力は不要です。🐙＝関西、🗼＝関東。</p>
+    <div class="tl" id="timeline"></div>
+  </section>
+
+  <section>
+    <h2>3. 最後に</h2>
+    <div class="card">
+      <div class="field"><label class="k" for="branch">所属</label><select id="branch"><option value="">選択</option><option>関西</option><option>関東</option><option>その他</option></select></div>
+      <div class="field"><label class="k" for="name">お名前<small>必須</small></label><input type="text" id="name" autocomplete="name" required placeholder="送り直すときも同じ名前で"></div>
+      <div class="field"><label class="k" for="free">自由記入<small>任意</small></label><textarea id="free"></textarea></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="submit" type="button">回答を送信</button>
+      <button class="btn sub" id="copy" type="button">回答をテキストでコピー</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+    <pre class="out" id="out" hidden></pre>
+  </section>
+</div>
+
+<div class="tally" aria-live="polite"><div class="in">
+  <span><span class="k">本番数</span><b id="tTotal">0</b></span>
+  <span><span class="k ricon" title="関西" aria-label="関西" role="img">🐙</span><b id="tKansai">0</b></span>
+  <span><span class="k ricon" title="関東" aria-label="関東" role="img">🗼</span><b id="tKanto">0</b></span>
+  <span><span class="k c-other">その他・未定</span><b id="tOther">0</b></span>
+  <span class="left" id="tLeft"></span>
+</div></div>
+
+<script>
+// Google Apps Script のウェブアプリURL（README の手順で発行したものを貼る）
+const ENDPOINT="";
+const MONTHS=["4","5","6","7","8","9","10","11","12","1","2","3"];
+const FIXED=[
+  {id:"mahler",tag:"個人参加（団の本番ではありません）",name:"マーラー（Atem Philharmonic Orchestra 第2回定演）",when:"4/24",m:0,region:"other",count:false,note:"団としては扱いませんが、参加を推奨しています（個人参加）。"},
+  {id:"kyoka6",tag:"練習（本番ではありません）",name:"強化練習（浜松）",when:"6月",m:2,region:"other",count:false,note:"本番ではありません。"},
+  {id:"kyoka1",tag:"練習（本番ではありません）",name:"強化練習（浜松）",when:"1月",m:9,region:"other",count:false,note:"本番ではありません。"},
+  {id:"cncn60",name:"CNCN 6.0",when:"3月",m:11,region:"other",count:true,note:"主催公演（固定にするかはTLで確認中）。"}
+];
+const PICK=[
+  {id:"joint",name:"ジョイント（Folia・Lupica・うた日和）",when:"5/15（土）",m:1,region:"kanto",note:["合同曲があるかもしれない。","関東の知り合いを気軽に呼べる。","大学生世代にリーチできる可能性がある。","会場は都内近郊で調整中。"]},
+  {id:"takarazuka",name:"宝塚国際室内合唱コンクール",when:"7月",m:3,region:"kansai",note:["予備審査あり。","特別演奏会に出られる可能性が高い。","審査員から直接講評をもらえる。"]},
+  {id:"tokyo",name:"東京国際合唱コンクール",when:"7月",m:3,region:"kanto",note:["予備審査あり、課題曲あり。","海外の審査員から、先入観のない講評をもらえる。","第1回から連続で参加していて、次で9回目。","フォルクロアの祭典と両方に出ることもできます。"]},
+  {id:"folklore",name:"フォルクロアの祭典",when:"7月",m:3,region:"kanto",note:["東京国際合唱コンクールと両方に出ることもできます。"]},
+  {id:"cncn55",name:"CNCN 5.5",when:"8月",m:4,region:"kansai",note:["知名度・人気が上がってきているイベント。","収支面でも10〜20万円ほど有利。"]},
+  {id:"jbc",name:"JBC（Japan Barbershop Convention）",when:"8月下旬見込み",m:4,region:"kanto",note:"バーバーショップのコンテスト。混声も同じクラスで審査。2027年の日程は未発表（2026年は横浜、エントリー締切は4月末）。"},
+  {id:"renmei",name:"全日本合唱コンクール 東京都大会",when:"9月",m:5,region:"kanto",note:["2027年度から職場一般部門の編成が3区分に：A 6〜18名、B 16〜40名、C 36名以上。","上位団体は全国大会（11月）に推薦される。","PMVは来年も出るらしい。"]},
+  {id:"renmei_zenkoku",name:"全日本合唱コンクール 全国大会",when:"11/13（土）・14（日）",m:7,region:"kanto",note:["所沢市民文化センター ミューズ（埼玉）。","出場できるのは、東京都大会で推薦された場合だけ。","「出る」は、全国大会まで目指すべきかどうかで答えてください。"]},
+  {id:"ancon",name:"アンコン（関西）",when:"12月 奈良／1月末 大阪／2月 兵庫",m:8,region:"kansai",note:["出る場合は、奈良・大阪・兵庫のどれか1つを選びます。","奈良（12月）：終わったあとでも、全国アンコンの公募審査（受付 12/7〜1/7）に間に合う。","大阪（1月末）：全国アンコンへの推薦あり。公募の受付は大阪の前に締め切られるので、公募も狙うなら先に録音を出しておく必要がある。","兵庫（2月）：全国アンコンへの推薦なし。事前審査あり。全国に出るには、兵庫より前に公募に出しておく必要がある。","大阪・兵庫はCNCN 6.0の直前になります。"],choiceLabel:"どのアンコン",choicePrefix:"アンコン：",choice:[["nara","奈良（12月）",8],["osaka","大阪（1月末）",9],["hyogo","兵庫（2月・事前審査あり）",10]]},
+  {id:"sfk",name:"SFK",when:"1月",m:9,region:"kansai",note:["Interkulturの国際コンペティションにつながる。"]},
+  {id:"zenkoku_ancon",name:"全国アンコン",when:"3月",m:11,region:"other",note:["福島。CNCN 6.0と時期が近い。","出場するには、府県の合唱連盟から推薦を受けるか、録音による公募審査を通るかのどちらか。","公募審査の日程（今季の例）：受付 12/7〜1/7（必着）、結果発表 2/3。","府県からの推薦の期限は 2/1。","出場は2〜16名。"]},
+  {id:"overseas",name:"海外コンクール",when:"時期は自由",m:null,region:"other",note:"例：マルクトオーバードルフ（5月）、World Choir Games（7月・リンツ）、台北国際（7〜8月）、A Voyage of Songs（8月・バンコク）など。",text:"どの大会・時期か"},
+  {id:"other",name:"その他（自由記入）",when:"",m:null,region:"other",note:"ここにない本番を入れたい場合だけ。",text:"本番名・時期・場所",noExcite:true}
+];
+const PURPOSES=["知名度","新入団員の獲得","演奏力の向上","他団体との交流","CNCN 5.5・6.0の準備","関西と関東のバランス","団員の負担を抑える","団に新しい刺激・挑戦がある"];
+const ALL=[...FIXED,...PICK];
+const byId=id=>ALL.find(e=>e.id===id);
+
+const KEY="cn-stageplan-2027-draft-v2";
+let S={excite:{},avail:{},purposes:[...PURPOSES],dec:{},choice:{ancon:"nara"},place:{},text:{},why:{},drop:{},countReason:"",personalCount:"",branch:"",name:"",free:""};
+try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d)S=Object.assign(S,d);}catch(e){}
+S.choice.ancon??="nara";
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+const el=(t,a={},...c)=>{const n=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==="class")n.className=v;else if(k.startsWith("on"))n.addEventListener(k.slice(2),v);else n.setAttribute(k,v);}c.flat().forEach(x=>x!=null&&x!==false&&n.append(x));return n;};
+const RLABEL={kansai:"関西",kanto:"関東",other:"その他・未定"};
+function regionOf(e){if(e.region==="place"){const p=S.place[e.id];return p==="関西"?"kansai":p==="関東"?"kanto":"other";}return e.region;}
+function monthOf(e){if(e.choice){const c=e.choice.find(c=>c[0]===S.choice[e.id]);return c?c[2]:e.m;}return e.m;}
+const RICON={kansai:"🐙",kanto:"🗼"};
+function regionChip(e){const r=regionOf(e);const t=e.region==="place"?"関西 or 関東":RLABEL[r];const ic=e.region==="place"?"🐙 or 🗼":RICON[r];
+  return ic?el("span",{class:"ricon",title:t,"aria-label":t,role:"img"},ic):el("span",{class:"chip c-"+r},t);}
+function displayName(e){if(e.choice){const c=e.choice.find(c=>c[0]===S.choice[e.id]);return (e.choicePrefix||"")+(c?c[1]:e.name);}if(e.region==="place")return e.name+"（"+S.place[e.id]+"）";return e.name;}
+function noteEl(e){if(!e.note||!e.note.length)return null;return Array.isArray(e.note)?el("ul",{class:"note nlist"},e.note.map(t=>el("li",{},t))):el("p",{class:"note"},e.note);}
+function head(e,extra){return el("div",{class:"ev-head"},el("span",{class:"when"},e.when),el("span",{class:"ev-name"},e.name),regionChip(e),extra);}
+function exciteField(e){
+  return el("div",{class:"field"},el("span",{class:"k"},"わくわく度",el("small",{},"個人の気持ち")),
+    el("div",{class:"scale"},el("span",{class:"lbl"},"惹かれない"),[1,2,3,4,5].map(v=>el("button",{type:"button","aria-pressed":String(S.excite[e.id]===v),"aria-label":e.name+" わくわく度"+v,onclick:()=>{S.excite[e.id]=v;persist();redraw(e);}},String(v))),el("span",{class:"lbl"},"出たい")));
+}
+const AVAIL=[["o","◯","出られる"],["t","△","わからない"],["x","✗","出られない"]];
+const hasAvail=e=>FIXED.includes(e)?!!e.count:!e.noExcite;
+function availField(e){
+  return el("div",{class:"field"},el("span",{class:"k"},"自分の参加",el("small",{},"あなたが出られるか")),
+    el("div",{class:"scale avail"},AVAIL.map(([v,sym,lab])=>el("button",{type:"button","aria-pressed":String(S.avail[e.id]===v),"aria-label":e.name+" "+lab,title:lab,onclick:()=>{S.avail[e.id]=S.avail[e.id]===v?undefined:v;persist();redraw(e);}},sym)),
+      el("span",{class:"lbl"},"◯出られる　△わからない　✗出られない")));
+}
+function radios(name,items,cur,on){return el("div",{class:"opts",role:"radiogroup"},items.map(([v,l])=>{const r=el("input",{type:"radio",name,value:v,onchange:()=>on(v)});r.checked=cur===v;return el("label",{},r,l);}));}
+
+function fixedCard(e){
+  return el("div",{class:"card fixed","data-id":e.id},head(e,el("span",{class:"chip c-muted"},e.tag||(e.count?"確定（本番数に入ります）":"本番数に入りません"))),noteEl(e),hasAvail(e)?availField(e):null);
+}
+function pickCard(e){
+  const d=S.dec[e.id];
+  const card=el("div",{class:"card"+(d==="in"?" in":d==="out"?" out":""),"data-id":e.id},head(e),noteEl(e));
+  if(!e.noExcite)card.append(exciteField(e));
+  if(hasAvail(e))card.append(availField(e));
+  const set=v=>{S.dec[e.id]=S.dec[e.id]===v?undefined:v;persist();redraw(e);refresh();};
+  card.append(el("div",{class:"field"},el("span",{class:"k"},"団として",el("small",{},"出るべきか")),
+    el("div",{class:"seg"},el("button",{type:"button",class:"yes","aria-pressed":String(d==="in"),onclick:()=>set("in")},"出る"),el("button",{type:"button",class:"no","aria-pressed":String(d==="out"),onclick:()=>set("out")},"出ない"))));
+  if(d==="in"){
+    const box=el("div",{class:"detail"});
+    if(e.choice)box.append(el("div",{class:"field"},el("span",{class:"k"},e.choiceLabel||"どれに出るか"),radios("ch-"+e.id,e.choice.map(c=>[c[0],c[1]]),S.choice[e.id],v=>{S.choice[e.id]=v;persist();refresh();})));
+    if(e.place)box.append(el("div",{class:"field"},el("span",{class:"k"},"開催地"),radios("pl-"+e.id,e.place.map(p=>[p,p]),S.place[e.id],v=>{S.place[e.id]=v;persist();redraw(e);refresh();})));
+    if(e.text){const t=el("input",{type:"text",placeholder:e.text,"aria-label":e.text,oninput:ev=>{S.text[e.id]=ev.target.value;persist();}});t.value=S.text[e.id]||"";box.append(el("div",{class:"field"},el("span",{class:"k"},"内容"),t));}
+    const w=S.why[e.id]||(S.why[e.id]={tags:[],note:""});
+    box.append(el("div",{class:"field"},el("span",{class:"k"},"目的",el("small",{},"1〜2個")),el("div",{class:"tags"},S.purposes.map(p=>el("button",{type:"button","aria-pressed":String(w.tags.includes(p)),onclick:()=>{const i=w.tags.indexOf(p);if(i>=0)w.tags.splice(i,1);else{if(w.tags.length>=2)w.tags.shift();w.tags.push(p);}persist();redraw(e);}},p)))));
+    const n=el("input",{type:"text",placeholder:"一言（なぜ団にとって必要か）","aria-label":e.name+"に出る理由",oninput:ev=>{w.note=ev.target.value;persist();}});n.value=w.note;
+    box.append(el("div",{class:"field"},el("span",{class:"k"},"理由"),n));
+    card.append(box);
+  }else if(d==="out"){
+    const t=el("input",{type:"text",placeholder:"一言（なぜ団として出なくてよいか）","aria-label":e.name+"に出ない理由",oninput:ev=>{S.drop[e.id]=ev.target.value;persist();}});t.value=S.drop[e.id]||"";
+    card.append(el("div",{class:"detail"},el("div",{class:"field"},el("span",{class:"k"},"理由"),t)));
+  }
+  return card;
+}
+function redraw(e){const old=document.querySelector('[data-id="'+e.id+'"]');const fresh=FIXED.includes(e)?fixedCard(e):pickCard(e);old.replaceWith(fresh);}
+
+function renderRank(){
+  const ol=document.getElementById("rankList");ol.replaceChildren();
+  S.purposes.forEach((p,i)=>{const mv=d=>{const j=i+d;if(j<0||j>=S.purposes.length)return;[S.purposes[i],S.purposes[j]]=[S.purposes[j],S.purposes[i]];persist();renderRank();PICK.filter(e=>S.dec[e.id]==="in").forEach(redraw);ol.children[j]?.querySelector(d<0?".up":".dn")?.focus();};
+    ol.append(el("li",{},el("span",{},p),el("button",{type:"button",class:"up","aria-label":p+"を上へ",onclick:()=>mv(-1)},"↑"),el("button",{type:"button",class:"dn","aria-label":p+"を下へ",onclick:()=>mv(1)},"↓")));
+  });
+}
+const selected=()=>PICK.filter(e=>S.dec[e.id]==="in");
+const counted=()=>[...FIXED.filter(e=>e.count),...selected()];
+function refresh(){
+  const list=counted();const c={kansai:0,kanto:0,other:0};
+  list.forEach(e=>{c[regionOf(e)]++;});
+  tTotal.textContent=list.length;tKansai.textContent=c.kansai;tKanto.textContent=c.kanto;tOther.textContent=c.other;
+  const left=PICK.filter(e=>!e.noExcite&&!S.dec[e.id]).length;tLeft.textContent=left?"未判断 "+left+"件":"すべて判断済み";
+  document.querySelectorAll("[data-mcount]").forEach(n=>{const k=n.dataset.mcount;const i=k==="null"?null:Number(k);
+    const c=[...FIXED.filter(e=>e.count&&e.m===i),...selected().filter(e=>monthOf(e)===i)];
+    n.textContent=c.length?"本番 "+c.length:"";n.className=c.length?"on":"";});
+}
+const TL=document.getElementById("timeline");
+[...MONTHS.map((lab,i)=>[i,lab+"月"]),[null,"時期自由"]].forEach(([i,lab])=>{
+  const evs=[...FIXED.filter(e=>e.m===i).map(fixedCard),...PICK.filter(e=>e.m===i).map(pickCard)];
+  TL.append(el("div",{class:"mrow"},el("div",{class:"mlab"},el("b",{},lab),el("span",{"data-mcount":String(i)},"")),
+    el("div",{class:"mcards"},evs.length?evs:el("p",{class:"mempty"},"候補なし"))));
+});
+renderRank();refresh();
+["branch","name","free"].forEach(k=>{const n=document.getElementById(k);n.value=S[k]||"";n.addEventListener("input",()=>{S[k]=n.value;persist();});});
+
+function payload(){
+  const sel=selected();
+  return {version:2,avail:Object.fromEntries(Object.entries(S.avail).filter(([k,v])=>v&&byId(k)&&hasAvail(byId(k)))),excite:Object.fromEntries(Object.entries(S.excite).filter(([k])=>PICK.some(e=>e.id===k))),purposes:S.purposes,
+    plan:counted().map(e=>({id:e.id,name:displayName(e),region:RLABEL[regionOf(e)],month:monthOf(e)==null?null:MONTHS[monthOf(e)]+"月",text:S.text[e.id]||""})),
+    reasons:Object.fromEntries(sel.map(e=>[e.id,S.why[e.id]||{tags:[],note:""}])),
+    dropped:Object.fromEntries(PICK.filter(e=>S.dec[e.id]==="out").map(e=>[e.id,S.drop[e.id]||""])),
+    undecided:PICK.filter(e=>!e.noExcite&&!S.dec[e.id]).map(e=>e.id),
+    total:counted().length,branch:S.branch,name:S.name,free:S.free};
+}
+function asText(){const p=payload();const AV={o:"◯",t:"△",x:"✗"};const ex=id=>(FIXED.some(f=>f.id===id)?"":" わくわく"+(p.excite[id]??"-"))+(hasAvail(byId(id))?" 自分"+(AV[p.avail[id]]||"-"):"");const L=[];
+  L.push("【2027年度 本番プランニング 回答】"+(p.name?"（"+p.name+"）":""),"所属："+(p.branch||"未回答"),"",
+    "■目的の優先順位",...p.purposes.map((x,i)=>(i+1)+". "+x),"",
+    "■出る（"+p.total+"本、確定分含む）",...p.plan.map(x=>"・"+(x.month||"時期未定")+" "+x.name+"［"+x.region+"］"+ex(x.id)+(x.text?" "+x.text:"")+(p.reasons[x.id]?" ／ "+p.reasons[x.id].tags.join("・")+(p.reasons[x.id].note?"："+p.reasons[x.id].note:""):"")),"",
+    "■出ない",...Object.entries(p.dropped).map(([id,v])=>"・"+byId(id).name+ex(id)+"："+(v||"-")),"",
+    "■未判断",...(p.undecided.length?p.undecided.map(id=>"・"+byId(id).name):["なし"]),"",
+    "■自分の参加（全イベント）",...ALL.filter(hasAvail).map(e=>"・"+e.name+"："+(AV[p.avail[e.id]]||"-")),"",
+    "■自由記入",p.free||"-");
+  return L.join("\n");}
+
+const status=document.getElementById("status");
+document.getElementById("copy").addEventListener("click",()=>{const t=asText();const out=document.getElementById("out");out.textContent=t;out.hidden=false;
+  const fallback=()=>{const r=document.createRange();r.selectNodeContents(out);const s=getSelection();s.removeAllRanges();s.addRange(r);status.className="status";status.textContent="下のテキストを選択しました。コピーして集計担当に送ってください。";};
+  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(t).then(()=>{status.className="status ok";status.textContent="コピーしました。";}).catch(fallback);else fallback();});
+
+let CID="";try{CID=localStorage.getItem("cn-stageplan-cid")||"";if(!CID){CID=Math.random().toString(36).slice(2,10);localStorage.setItem("cn-stageplan-cid",CID);}}catch(e){}
+const DEC={in:"出る",out:"出ない"};const AVL={o:"◯",t:"△",x:"✗"};
+function flatRow(p){
+  const tally={kansai:0,kanto:0,other:0};counted().forEach(e=>tally[regionOf(e)]++);
+  const r={"名前":S.name.trim(),"所属":S.branch||"","本番数":p.total,"関西":tally.kansai,"関東":tally.kanto,"その他":tally.other,"目的の順位":S.purposes.map((x,i)=>(i+1)+"."+x).join(" ")};
+  ALL.forEach(e=>{
+    const pick=PICK.includes(e);
+    if(!pick&&!hasAvail(e))return;
+    const k=e.name+"｜";
+    if(pick&&!e.noExcite)r[k+"わくわく"]=S.excite[e.id]??"";
+    if(hasAvail(e))r[k+"自分"]=AVL[S.avail[e.id]]||"";
+    if(!pick)return;
+    r[k+"団として"]=DEC[S.dec[e.id]]||"";
+    if(e.choice)r[k+"選択"]=S.dec[e.id]==="in"?displayName(e):"";
+    if(e.text)r[k+"内容"]=S.dec[e.id]==="in"?(S.text[e.id]||""):"";
+    const w=S.why[e.id];
+    r[k+"目的"]=S.dec[e.id]==="in"&&w?w.tags.join("・"):"";
+    r[k+"理由"]=S.dec[e.id]==="in"?(w?.note||""):S.dec[e.id]==="out"?(S.drop[e.id]||""):"";
+  });
+  r["未判断"]=p.undecided.map(id=>byId(id).name).join("、");
+  r["自由記入"]=S.free||"";r["端末ID"]=CID;r["JSON"]=JSON.stringify(p);
+  return r;
+}
+document.getElementById("submit").addEventListener("click",async()=>{
+  const p=payload();
+  if(!S.name.trim()){status.className="status err";status.textContent="お名前を入力してください。";document.getElementById("name").focus();return;}
+  if(!selected().length&&!Object.keys(p.dropped).length){status.className="status err";status.textContent="本番のカードで「出る／出ない」を選んでから送信してください。";return;}
+  if(!ENDPOINT){status.className="status err";status.textContent="送信先が設定されていません。「回答をテキストでコピー」で集計担当に送ってください。";return;}
+  status.className="status";status.textContent="送信しています…";
+  try{
+    await fetch(ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(flatRow(p))});
+    status.className="status ok";status.textContent=p.undecided.length?"送信しました（未判断が"+p.undecided.length+"件あります。同じ名前で送り直すと、最新の回答が使われます）。":"送信しました。同じ名前で送り直すと、最新の回答が使われます。";
+  }catch(err){status.className="status err";status.textContent="送信できませんでした。通信状況を確かめてもう一度送るか、「回答をテキストでコピー」で集計担当に送ってください。";}
+});
+</script>
+</body>
+</html>
