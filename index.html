@@ -60,6 +60,7 @@ p{margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .card.in{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .card.out{background:var(--out-soft)}
+.rank.missing{outline:2px solid var(--kansai);outline-offset:4px;border-radius:6px}
 .card.missing{border-color:var(--kansai);box-shadow:inset 0 0 0 2px var(--kansai)}
 .req{color:var(--kansai);font-weight:700}
 .card.fixed{background:transparent;border-style:dashed;padding:12px 16px;gap:4px}
@@ -138,8 +139,9 @@ pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px sol
 
   <section>
     <h2>1. 団として大事にしたい目的</h2>
-    <p class="muted">来年度のノーヴァにとって大事だと思う順に並べ替えてください。本番の理由を選ぶときに使います。</p>
-    <ol class="rank" id="rankList"></ol>
+    <p class="muted">来年度のノーヴァにとって大事だと思う順に並べ替えてください。本番の理由を選ぶときに使います。並べ替えたら（今の順番のままでよければそのまま）「この順番で決定」を押してください。<span class="req">必須</span></p>
+    <ol class="rank" id="rankList" data-id="__rank"></ol>
+    <div class="actions"><button class="btn sub" id="rankOk" type="button">この順番で決定</button><span class="status" id="rankStatus"></span></div>
   </section>
 
   <section>
@@ -203,9 +205,8 @@ const ALL=[...FIXED,...PICK];
 const byId=id=>ALL.find(e=>e.id===id);
 
 const KEY="cn-stageplan-2027-draft-v2";
-let S={excite:{},avail:{},purposes:[...PURPOSES],dec:{},choice:{ancon:"nara"},place:{},text:{},why:{},drop:{},countReason:"",personalCount:"",branch:"",name:"",free:""};
+let S={excite:{},avail:{},purposes:[...PURPOSES],dec:{},choice:{},rankDone:false,place:{},text:{},why:{},drop:{},countReason:"",personalCount:"",branch:"",name:"",free:""};
 try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d)S=Object.assign(S,d);}catch(e){}
-S.choice.ancon??="nara";
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 const el=(t,a={},...c)=>{const n=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==="class")n.className=v;else if(k.startsWith("on"))n.addEventListener(k.slice(2),v);else n.setAttribute(k,v);}c.flat().forEach(x=>x!=null&&x!==false&&n.append(x));return n;};
@@ -244,7 +245,7 @@ function pickCard(e){
     el("div",{class:"seg"},el("button",{type:"button",class:"yes","aria-pressed":String(d==="in"),onclick:()=>set("in")},"出る"),el("button",{type:"button",class:"no","aria-pressed":String(d==="out"),onclick:()=>set("out")},"出ない"))));
   if(d==="in"){
     const box=el("div",{class:"detail"});
-    if(e.choice)box.append(el("div",{class:"field"},el("span",{class:"k"},e.choiceLabel||"どれに出るか"),radios("ch-"+e.id,e.choice.map(c=>[c[0],c[1]]),S.choice[e.id],v=>{S.choice[e.id]=v;persist();refresh();})));
+    if(e.choice)box.append(el("div",{class:"field"},el("span",{class:"k"},e.choiceLabel||"どれに出るか",el("small",{class:"req"},"必須")),radios("ch-"+e.id,e.choice.map(c=>[c[0],c[1]]),S.choice[e.id],v=>{S.choice[e.id]=v;persist();refresh();})));
     if(e.place)box.append(el("div",{class:"field"},el("span",{class:"k"},"開催地"),radios("pl-"+e.id,e.place.map(p=>[p,p]),S.place[e.id],v=>{S.place[e.id]=v;persist();redraw(e);refresh();})));
     if(e.text){const t=el("input",{type:"text",placeholder:e.text,"aria-label":e.text,oninput:ev=>{S.text[e.id]=ev.target.value;persist();refresh();}});t.value=S.text[e.id]||"";box.append(el("div",{class:"field"},el("span",{class:"k"},"内容"),t));}
     const w=S.why[e.id]||(S.why[e.id]={tags:[],note:""});
@@ -260,9 +261,11 @@ function pickCard(e){
 }
 function redraw(e){const old=document.querySelector('[data-id="'+e.id+'"]');const fresh=FIXED.includes(e)?fixedCard(e):pickCard(e);old.replaceWith(fresh);}
 
+function rankState(){const b=document.getElementById("rankOk"),t=document.getElementById("rankStatus");if(!b)return;b.textContent=S.rankDone?"決定済み（並べ替えると更新されます）":"この順番で決定";b.disabled=!!S.rankDone;t.className="status"+(S.rankDone?" ok":"");t.textContent=S.rankDone?"✓":"";if(S.rankDone)document.getElementById("rankList").classList.remove("missing");}
 function renderRank(){
+  rankState();
   const ol=document.getElementById("rankList");ol.replaceChildren();
-  S.purposes.forEach((p,i)=>{const mv=d=>{const j=i+d;if(j<0||j>=S.purposes.length)return;[S.purposes[i],S.purposes[j]]=[S.purposes[j],S.purposes[i]];persist();renderRank();PICK.filter(e=>S.dec[e.id]==="in").forEach(redraw);ol.children[j]?.querySelector(d<0?".up":".dn")?.focus();};
+  S.purposes.forEach((p,i)=>{const mv=d=>{const j=i+d;if(j<0||j>=S.purposes.length)return;[S.purposes[i],S.purposes[j]]=[S.purposes[j],S.purposes[i]];S.rankDone=true;persist();renderRank();refresh();PICK.filter(e=>S.dec[e.id]==="in").forEach(redraw);ol.children[j]?.querySelector(d<0?".up":".dn")?.focus();};
     ol.append(el("li",{},el("span",{},p),el("button",{type:"button",class:"up","aria-label":p+"を上へ",onclick:()=>mv(-1)},"↑"),el("button",{type:"button",class:"dn","aria-label":p+"を下へ",onclick:()=>mv(1)},"↓")));
   });
 }
@@ -271,6 +274,7 @@ const counted=()=>[...FIXED.filter(e=>e.count),...selected()];
 // 必須：「その他」以外の全本番で わくわく度・自分の参加・出る／出ない・理由（出るなら目的も）。CNCN 6.0 は自分の参加。「その他」は出るを選んだ場合だけ内容と理由
 function missing(){
   const out=[];
+  if(!S.rankDone)out.push({e:{id:"__rank",name:"目的の並べ替え"},what:"決定"});
   PICK.forEach(e=>{
     const d=S.dec[e.id];
     if(e.noExcite){
@@ -283,6 +287,7 @@ function missing(){
     if(!S.avail[e.id])lack.push("自分の参加");
     if(!d)lack.push("出る／出ない");
     else{
+      if(d==="in"&&e.choice&&!S.choice[e.id])lack.push(e.choiceLabel||"どれに出るか");
       if(d==="in"&&e.text&&!(S.text[e.id]||"").trim())lack.push("内容");
       if(d==="in"&&!(S.why[e.id]?.tags||[]).length)lack.push("目的");
       const reason=d==="in"?(S.why[e.id]?.note||""):(S.drop[e.id]||"");
@@ -309,6 +314,7 @@ const TL=document.getElementById("timeline");
     el("div",{class:"mcards"},evs.length?evs:el("p",{class:"mempty"},"候補なし"))));
 });
 renderRank();refresh();
+document.getElementById("rankOk").addEventListener("click",()=>{S.rankDone=true;persist();rankState();refresh();});
 ["branch","name","free"].forEach(k=>{const n=document.getElementById(k);n.value=S[k]||"";n.addEventListener("input",()=>{S[k]=n.value;persist();});});
 
 function payload(){
@@ -367,7 +373,7 @@ document.getElementById("submit").addEventListener("click",async()=>{
   if(miss.length){
     miss.forEach(m=>document.querySelector('[data-id="'+m.e.id+'"]')?.classList.add("missing"));
     status.className="status err";
-    status.textContent="未入力が"+miss.length+"件あります（赤枠のカード）："+miss.map(m=>m.e.name.replace(/（.*?）/g,"")+"の"+m.what).join("、");
+    status.textContent="未入力が"+miss.length+"件あります（赤枠の箇所）："+miss.map(m=>m.e.name.replace(/（.*?）/g,"")+"の"+m.what).join("、");
     document.querySelector('[data-id="'+miss[0].e.id+'"]')?.scrollIntoView({behavior:"smooth",block:"center"});
     return;
   }
