@@ -60,6 +60,8 @@ p{margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .card.in{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .card.out{background:var(--out-soft)}
+.card.missing{border-color:var(--kansai);box-shadow:inset 0 0 0 2px var(--kansai)}
+.req{color:var(--kansai);font-weight:700}
 .card.fixed{background:transparent;border-style:dashed;padding:12px 16px;gap:4px}
 .ev-head{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
 .ev-name{font-weight:700;font-size:1.02rem}
@@ -142,7 +144,7 @@ pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px sol
 
   <section>
     <h2>2. 本番ごとの判断</h2>
-    <p class="muted">月ごとに本番を並べています。各カードで「わくわく度」はあなた個人の気持ち、「団として」は団にとって出るべきかを答えてください。点線のカードは確定・参考で、入力は不要です。🐙＝関西、🗼＝関東。</p>
+    <p class="muted">月ごとに本番を並べています。各カードで「わくわく度」はあなた個人の気持ち、「団として」は団にとって出るべきかを答えてください。<span class="req">すべての本番で「出る／出ない」とその理由が必須です。</span>点線のカードは確定・参考で、入力は不要です。🐙＝関西、🗼＝関東。</p>
     <div class="tl" id="timeline"></div>
   </section>
 
@@ -238,21 +240,21 @@ function pickCard(e){
   if(!e.noExcite)card.append(exciteField(e));
   if(hasAvail(e))card.append(availField(e));
   const set=v=>{S.dec[e.id]=S.dec[e.id]===v?undefined:v;persist();redraw(e);refresh();};
-  card.append(el("div",{class:"field"},el("span",{class:"k"},"団として",el("small",{},"出るべきか")),
+  card.append(el("div",{class:"field"},el("span",{class:"k"},"団として",el("small",{},"出るべきか（必須）")),
     el("div",{class:"seg"},el("button",{type:"button",class:"yes","aria-pressed":String(d==="in"),onclick:()=>set("in")},"出る"),el("button",{type:"button",class:"no","aria-pressed":String(d==="out"),onclick:()=>set("out")},"出ない"))));
   if(d==="in"){
     const box=el("div",{class:"detail"});
     if(e.choice)box.append(el("div",{class:"field"},el("span",{class:"k"},e.choiceLabel||"どれに出るか"),radios("ch-"+e.id,e.choice.map(c=>[c[0],c[1]]),S.choice[e.id],v=>{S.choice[e.id]=v;persist();refresh();})));
     if(e.place)box.append(el("div",{class:"field"},el("span",{class:"k"},"開催地"),radios("pl-"+e.id,e.place.map(p=>[p,p]),S.place[e.id],v=>{S.place[e.id]=v;persist();redraw(e);refresh();})));
-    if(e.text){const t=el("input",{type:"text",placeholder:e.text,"aria-label":e.text,oninput:ev=>{S.text[e.id]=ev.target.value;persist();}});t.value=S.text[e.id]||"";box.append(el("div",{class:"field"},el("span",{class:"k"},"内容"),t));}
+    if(e.text){const t=el("input",{type:"text",placeholder:e.text,"aria-label":e.text,oninput:ev=>{S.text[e.id]=ev.target.value;persist();refresh();}});t.value=S.text[e.id]||"";box.append(el("div",{class:"field"},el("span",{class:"k"},"内容"),t));}
     const w=S.why[e.id]||(S.why[e.id]={tags:[],note:""});
     box.append(el("div",{class:"field"},el("span",{class:"k"},"目的",el("small",{},"1〜2個")),el("div",{class:"tags"},S.purposes.map(p=>el("button",{type:"button","aria-pressed":String(w.tags.includes(p)),onclick:()=>{const i=w.tags.indexOf(p);if(i>=0)w.tags.splice(i,1);else{if(w.tags.length>=2)w.tags.shift();w.tags.push(p);}persist();redraw(e);}},p)))));
-    const n=el("input",{type:"text",placeholder:"一言（なぜ団にとって必要か）","aria-label":e.name+"に出る理由",oninput:ev=>{w.note=ev.target.value;persist();}});n.value=w.note;
-    box.append(el("div",{class:"field"},el("span",{class:"k"},"理由"),n));
+    const n=el("input",{type:"text",placeholder:"一言（なぜ団にとって必要か）","aria-label":e.name+"に出る理由",oninput:ev=>{w.note=ev.target.value;persist();refresh();}});n.value=w.note;
+    box.append(el("div",{class:"field"},el("span",{class:"k"},"理由",el("small",{class:"req"},"必須")),n));
     card.append(box);
   }else if(d==="out"){
-    const t=el("input",{type:"text",placeholder:"一言（なぜ団として出なくてよいか）","aria-label":e.name+"に出ない理由",oninput:ev=>{S.drop[e.id]=ev.target.value;persist();}});t.value=S.drop[e.id]||"";
-    card.append(el("div",{class:"detail"},el("div",{class:"field"},el("span",{class:"k"},"理由"),t)));
+    const t=el("input",{type:"text",placeholder:"一言（なぜ団として出なくてよいか）","aria-label":e.name+"に出ない理由",oninput:ev=>{S.drop[e.id]=ev.target.value;persist();refresh();}});t.value=S.drop[e.id]||"";
+    card.append(el("div",{class:"detail"},el("div",{class:"field"},el("span",{class:"k"},"理由",el("small",{class:"req"},"必須")),t)));
   }
   return card;
 }
@@ -266,11 +268,27 @@ function renderRank(){
 }
 const selected=()=>PICK.filter(e=>S.dec[e.id]==="in");
 const counted=()=>[...FIXED.filter(e=>e.count),...selected()];
+// 必須：「その他」以外の全本番で出る／出ないと理由。「その他」は出るを選んだ場合だけ内容と理由
+function missing(){
+  const out=[];
+  PICK.forEach(e=>{
+    const d=S.dec[e.id];
+    if(e.noExcite){
+      if(d==="in"&&(!(S.text[e.id]||"").trim()||!(S.why[e.id]?.note||"").trim()))out.push({e,what:"内容・理由"});
+      else if(d==="out")return;
+      return;
+    }
+    if(!d){out.push({e,what:"出る／出ない"});return;}
+    const reason=d==="in"?(S.why[e.id]?.note||""):(S.drop[e.id]||"");
+    if(!reason.trim())out.push({e,what:"理由"});
+  });
+  return out;
+}
 function refresh(){
   const list=counted();const c={kansai:0,kanto:0,other:0};
   list.forEach(e=>{c[regionOf(e)]++;});
   tTotal.textContent=list.length;tKansai.textContent=c.kansai;tKanto.textContent=c.kanto;tOther.textContent=c.other;
-  const left=PICK.filter(e=>!e.noExcite&&!S.dec[e.id]).length;tLeft.textContent=left?"未判断 "+left+"件":"すべて判断済み";
+  const miss=missing();tLeft.textContent=miss.length?"未入力 "+miss.length+"件":"すべて入力済み";
   document.querySelectorAll("[data-mcount]").forEach(n=>{const k=n.dataset.mcount;const i=k==="null"?null:Number(k);
     const c=[...FIXED.filter(e=>e.count&&e.m===i),...selected().filter(e=>monthOf(e)===i)];
     n.textContent=c.length?"本番 "+c.length:"";n.className=c.length?"on":"";});
@@ -334,7 +352,15 @@ function flatRow(p){
 document.getElementById("submit").addEventListener("click",async()=>{
   const p=payload();
   if(!S.name.trim()){status.className="status err";status.textContent="お名前を入力してください。";document.getElementById("name").focus();return;}
-  if(!selected().length&&!Object.keys(p.dropped).length){status.className="status err";status.textContent="本番のカードで「出る／出ない」を選んでから送信してください。";return;}
+  const miss=missing();
+  document.querySelectorAll(".card.missing").forEach(c=>c.classList.remove("missing"));
+  if(miss.length){
+    miss.forEach(m=>document.querySelector('[data-id="'+m.e.id+'"]')?.classList.add("missing"));
+    status.className="status err";
+    status.textContent="未入力が"+miss.length+"件あります（赤枠のカード）："+miss.map(m=>m.e.name.replace(/（.*?）/g,"")+"の"+m.what).join("、");
+    document.querySelector('[data-id="'+miss[0].e.id+'"]')?.scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
   status.className="status";status.textContent="送信しています…";
   try{
     const row=flatRow(p);
