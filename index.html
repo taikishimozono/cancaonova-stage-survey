@@ -144,7 +144,7 @@ pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px sol
 
   <section>
     <h2>2. 本番ごとの判断</h2>
-    <p class="muted">月ごとに本番を並べています。各カードで「わくわく度」はあなた個人の気持ち、「団として」は団にとって出るべきかを答えてください。<span class="req">すべての本番で「出る／出ない」とその理由が必須です。</span>点線のカードは確定・参考で、入力は不要です。🐙＝関西、🗼＝関東。</p>
+    <p class="muted">月ごとに本番を並べています。各カードで「わくわく度」はあなた個人の気持ち、「団として」は団にとって出るべきかを答えてください。<span class="req">すべての本番で、わくわく度・自分の参加・出る／出ない・理由（出る場合は目的も）が必須です。</span>点線のカードは確定・参考で、入力は不要です。🐙＝関西、🗼＝関東。</p>
     <div class="tl" id="timeline"></div>
   </section>
 
@@ -219,14 +219,14 @@ function displayName(e){if(e.choice){const c=e.choice.find(c=>c[0]===S.choice[e.
 function noteEl(e){if(!e.note||!e.note.length)return null;return Array.isArray(e.note)?el("ul",{class:"note nlist"},e.note.map(t=>el("li",{},t))):el("p",{class:"note"},e.note);}
 function head(e,extra){return el("div",{class:"ev-head"},el("span",{class:"when"},e.when),el("span",{class:"ev-name"},e.name),regionChip(e),extra);}
 function exciteField(e){
-  return el("div",{class:"field"},el("span",{class:"k"},"わくわく度",el("small",{},"個人の気持ち")),
-    el("div",{class:"scale"},el("span",{class:"lbl"},"惹かれない"),[1,2,3,4,5].map(v=>el("button",{type:"button","aria-pressed":String(S.excite[e.id]===v),"aria-label":e.name+" わくわく度"+v,onclick:()=>{S.excite[e.id]=v;persist();redraw(e);}},String(v))),el("span",{class:"lbl"},"出たい")));
+  return el("div",{class:"field"},el("span",{class:"k"},"わくわく度",el("small",{},"個人の気持ち（必須）")),
+    el("div",{class:"scale"},el("span",{class:"lbl"},"惹かれない"),[1,2,3,4,5].map(v=>el("button",{type:"button","aria-pressed":String(S.excite[e.id]===v),"aria-label":e.name+" わくわく度"+v,onclick:()=>{S.excite[e.id]=v;persist();redraw(e);refresh();}},String(v))),el("span",{class:"lbl"},"出たい")));
 }
 const AVAIL=[["o","◯","出られる"],["t","△","わからない"],["x","✗","出られない"]];
 const hasAvail=e=>FIXED.includes(e)?!!e.count:!e.noExcite;
 function availField(e){
-  return el("div",{class:"field"},el("span",{class:"k"},"自分の参加",el("small",{},"あなたが出られるか")),
-    el("div",{class:"scale avail"},AVAIL.map(([v,sym,lab])=>el("button",{type:"button","aria-pressed":String(S.avail[e.id]===v),"aria-label":e.name+" "+lab,title:lab,onclick:()=>{S.avail[e.id]=S.avail[e.id]===v?undefined:v;persist();redraw(e);}},sym)),
+  return el("div",{class:"field"},el("span",{class:"k"},"自分の参加",el("small",{},"あなたが出られるか（必須）")),
+    el("div",{class:"scale avail"},AVAIL.map(([v,sym,lab])=>el("button",{type:"button","aria-pressed":String(S.avail[e.id]===v),"aria-label":e.name+" "+lab,title:lab,onclick:()=>{S.avail[e.id]=S.avail[e.id]===v?undefined:v;persist();redraw(e);refresh();}},sym)),
       el("span",{class:"lbl"},"◯出られる　△わからない　✗出られない")));
 }
 function radios(name,items,cur,on){return el("div",{class:"opts",role:"radiogroup"},items.map(([v,l])=>{const r=el("input",{type:"radio",name,value:v,onchange:()=>on(v)});r.checked=cur===v;return el("label",{},r,l);}));}
@@ -248,7 +248,7 @@ function pickCard(e){
     if(e.place)box.append(el("div",{class:"field"},el("span",{class:"k"},"開催地"),radios("pl-"+e.id,e.place.map(p=>[p,p]),S.place[e.id],v=>{S.place[e.id]=v;persist();redraw(e);refresh();})));
     if(e.text){const t=el("input",{type:"text",placeholder:e.text,"aria-label":e.text,oninput:ev=>{S.text[e.id]=ev.target.value;persist();refresh();}});t.value=S.text[e.id]||"";box.append(el("div",{class:"field"},el("span",{class:"k"},"内容"),t));}
     const w=S.why[e.id]||(S.why[e.id]={tags:[],note:""});
-    box.append(el("div",{class:"field"},el("span",{class:"k"},"目的",el("small",{},"1〜2個")),el("div",{class:"tags"},S.purposes.map(p=>el("button",{type:"button","aria-pressed":String(w.tags.includes(p)),onclick:()=>{const i=w.tags.indexOf(p);if(i>=0)w.tags.splice(i,1);else{if(w.tags.length>=2)w.tags.shift();w.tags.push(p);}persist();redraw(e);}},p)))));
+    box.append(el("div",{class:"field"},el("span",{class:"k"},"目的",el("small",{},"1〜2個（必須）")),el("div",{class:"tags"},S.purposes.map(p=>el("button",{type:"button","aria-pressed":String(w.tags.includes(p)),onclick:()=>{const i=w.tags.indexOf(p);if(i>=0)w.tags.splice(i,1);else{if(w.tags.length>=2)w.tags.shift();w.tags.push(p);}persist();redraw(e);refresh();}},p)))));
     const n=el("input",{type:"text",placeholder:"一言（なぜ団にとって必要か）","aria-label":e.name+"に出る理由",oninput:ev=>{w.note=ev.target.value;persist();refresh();}});n.value=w.note;
     box.append(el("div",{class:"field"},el("span",{class:"k"},"理由",el("small",{class:"req"},"必須")),n));
     card.append(box);
@@ -268,7 +268,7 @@ function renderRank(){
 }
 const selected=()=>PICK.filter(e=>S.dec[e.id]==="in");
 const counted=()=>[...FIXED.filter(e=>e.count),...selected()];
-// 必須：「その他」以外の全本番で出る／出ないと理由。「その他」は出るを選んだ場合だけ内容と理由
+// 必須：「その他」以外の全本番で わくわく度・自分の参加・出る／出ない・理由（出るなら目的も）。CNCN 6.0 は自分の参加。「その他」は出るを選んだ場合だけ内容と理由
 function missing(){
   const out=[];
   PICK.forEach(e=>{
@@ -278,10 +278,18 @@ function missing(){
       else if(d==="out")return;
       return;
     }
-    if(!d){out.push({e,what:"出る／出ない"});return;}
-    const reason=d==="in"?(S.why[e.id]?.note||""):(S.drop[e.id]||"");
-    if(!reason.trim())out.push({e,what:"理由"});
+    const lack=[];
+    if(S.excite[e.id]==null)lack.push("わくわく度");
+    if(!S.avail[e.id])lack.push("自分の参加");
+    if(!d)lack.push("出る／出ない");
+    else{
+      if(d==="in"&&!(S.why[e.id]?.tags||[]).length)lack.push("目的");
+      const reason=d==="in"?(S.why[e.id]?.note||""):(S.drop[e.id]||"");
+      if(!reason.trim())lack.push("理由");
+    }
+    if(lack.length)out.push({e,what:lack.join("・")});
   });
+  FIXED.filter(hasAvail).forEach(e=>{if(!S.avail[e.id])out.push({e,what:"自分の参加"});});
   return out;
 }
 function refresh(){
