@@ -151,7 +151,7 @@ pre.out{white-space:pre-wrap;font-size:.8rem;background:var(--bg);border:1px sol
   <section>
     <h2>3. 最後に</h2>
     <div class="card">
-      <div class="field"><label class="k" for="branch">所属</label><select id="branch"><option value="">選択</option><option>関西</option><option>関東</option><option>その他</option></select></div>
+      <div class="field"><label class="k" for="branch">所属<small class="req">必須</small></label><select id="branch"><option value="">選択</option><option>関西</option><option>関東</option><option>その他</option></select></div>
       <div class="field"><label class="k" for="name">お名前<small>必須</small></label><input type="text" id="name" autocomplete="name" required placeholder="送り直すときも同じ名前で"></div>
       <div class="field"><label class="k" for="free">自由記入<small>任意</small></label><textarea id="free"></textarea></div>
     </div>
@@ -283,6 +283,7 @@ function missing(){
     if(!S.avail[e.id])lack.push("自分の参加");
     if(!d)lack.push("出る／出ない");
     else{
+      if(d==="in"&&e.text&&!(S.text[e.id]||"").trim())lack.push("内容");
       if(d==="in"&&!(S.why[e.id]?.tags||[]).length)lack.push("目的");
       const reason=d==="in"?(S.why[e.id]?.note||""):(S.drop[e.id]||"");
       if(!reason.trim())lack.push("理由");
@@ -360,6 +361,7 @@ function flatRow(p){
 document.getElementById("submit").addEventListener("click",async()=>{
   const p=payload();
   if(!S.name.trim()){status.className="status err";status.textContent="お名前を入力してください。";document.getElementById("name").focus();return;}
+  if(!S.branch){status.className="status err";status.textContent="所属を選んでください。";document.getElementById("branch").focus();return;}
   const miss=missing();
   document.querySelectorAll(".card.missing").forEach(c=>c.classList.remove("missing"));
   if(miss.length){
